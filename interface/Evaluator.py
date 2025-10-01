@@ -1,6 +1,6 @@
 from interface.Solution import Solution
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Tuple
 
 E = TypeVar('E')
 

@@ -3,7 +3,7 @@ from interface.Solution import Solution
 import random
 import numbers
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, List, Optional
+from typing import TypeVar, Generic, List, Optional, Set
 
 """
 TODO:
@@ -49,31 +49,48 @@ class GA(Generic[G, F], ABC):
         """
         self.obj_function: Evaluator[F] = obj_function
         self.generations: int = generations
-        self.pop_size: int = pop_size
+        if pop_size<2:
+            print("Warning: adjusting population size to 2 because of insuficient individuals.")
+            self.pop_size = 2
+        else:
+            self.pop_size = pop_size
         self.mutation_rate: float = mutation_rate
         self.chromosome_size: int = self.obj_function.get_domain_size()
         self.best_sol: Optional[Solution[F]] = None
         self.best_chromosome: Optional[Chromosome[G]] = None
 
-    @abstractmethod
-    def _decode(self, chromosome: Chromosome[G]) -> Solution[F]:
-        """Maps a genotype (chromosome) to a phenotype (solution)."""
-        pass
 
+    """
+    <- ABSTRACT METHODS (Problem-Specific - MUST be implemented in subclass) ->
+    """
     @abstractmethod
-    def _generate_random_chromosome(self) -> Chromosome[G]:
-        """Generates a random chromosome."""
-        pass
+    def _decode(self, chromosome: Chromosome[G]) -> Solution[F]: pass
+    
+    """
+    <- Methods with default implementation and Mixins coupling
+    """
+    def _initialize_population(self) -> Population[G]:
+        """
+        * DEFAULT: Generates the initial population using simple uniform random generation.
+        ! Overridden by an initialization mixin (e.g., LHS).
+        """
+        return [self._generate_random_chromosome() for _ in range(self.pop_size)]
 
-    @abstractmethod
-    def _fitness(self, chromosome: Chromosome[G]) -> float:
-        """Calculates the fitness for a given chromosome."""
-        pass
+    def _select_parents(self, population: Population[G]) -> Population[G]:
+        """
+        * DEFAULT: Selects parents using simple **Tournament Selection** (k=2).
+        ! Overridden by a selection mixin (e.g., SUS).
+        """
+        parents = []
+        for _ in range(self.pop_size):
+            p1 = self.rng.choice(population)
+            p2 = self.rng.choice(population)
+            parents.append(p1 if self._fitness(p1) > self._fitness(p2) else p2)
+        return parents
 
-    @abstractmethod
-    def _mutate_gene(self, chromosome: Chromosome[G], locus: int) -> None:
-        """Mutates a single gene at a specific locus in the chromosome."""
-        pass
+    """
+    <- Optional methods with default implementation ->
+    """
 
     def solve(self) -> Optional[Solution[F]]:
         """
@@ -105,28 +122,20 @@ class GA(Generic[G, F], ABC):
 
         return self.best_sol
 
-    def _initialize_population(self) -> Population[G]:
-        """Generates the initial population with latin hypercube sampling."""
-        return [self._latin_hypercube() for _ in range(self.pop_size)]
     
-    def _latin_hypercube_sampling(self):
+    def _generate_random_chromosome(self) -> Chromosome[G]:
+        chromosome = [random.randint(0, 1) for _ in range(self.chromosome_size)]
+        return chromosome
+    
+    def _mutate_gene(self, chromosome: Chromosome[G], locus: int) -> None:
         """
-        Implementation of latin hypercube sampling; guarantees a better space coverage than random sampling.
+        Mutates a gene by flipping its bit (0 becomes 1, and 1 becomes 0).
         """
-        pass
+        chromosome[locus] = 1 - chromosome[locus]
 
-    def _stocastic_universal_selection(self):
-        """Implementation of SUS"""
-        pass
-
-    def _adaptative_mutation(self):
-        pass
-
-    def _uniform_crossover(self):
-        pass
-
-    def _steady_state(self):
-        pass
+    def _fitness(self, chromosome: Chromosome[G]) -> float:
+        # ? Maybe a future mixin implementation of fitness scalling is good
+        return self._decode(chromosome).cost
 
     def _get_best_chromosome(self, population: Population[G]) -> Chromosome[G]:
         """Finds the chromosome with the highest fitness in a population."""
@@ -136,14 +145,6 @@ class GA(Generic[G, F], ABC):
         """Finds the chromosome with the lowest fitness in a population."""
         return min(population, key=self._fitness)
 
-    def _select_parents(self, population: Population[G]) -> Population[G]:
-        """Selects parents for crossover using tournament selection."""
-        parents = []
-        for _ in range(self.pop_size):
-            p1 = self.rng.choice(population)
-            p2 = self.rng.choice(population)
-            parents.append(p1 if self._fitness(p1) > self._fitness(p2) else p2)
-        return parents
 
     def _crossover(self, parents: Population[G]) -> Population[G]:
         """Performs 2-point crossover on pairs of parents to create offspring."""

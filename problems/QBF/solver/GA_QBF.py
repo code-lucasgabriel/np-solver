@@ -1,9 +1,12 @@
-from metaheuristics.GA import GA, Chromosome
+from metaheuristics.GA.GA import GA, Chromosome
+from metaheuristics.GA.Mixin import LatinHypercubeInitializerMixin
 from problems.QBF.QBF import QBF
 from interface.Solution import Solution
 import time
 
-class GA_QBF(GA[int, int]):
+class GA_QBF(
+    GA[int, int]
+):
     """
     A specific implementation of the Genetic Algorithm for solving the
     Quadratic Binary Function (QBF) problem.
@@ -37,22 +40,4 @@ class GA_QBF(GA[int, int]):
         
         self.obj_function.evaluate(solution)
         return solution
-
-    def _generate_random_chromosome(self) -> Chromosome[int]:
-        """
-        Generates a random binary chromosome. Each gene is either 0 or 1.
-        """
-        return [self.rng.randint(0, 1) for _ in range(self.chromosome_size)]
-
-    def _fitness(self, chromosome: Chromosome[int]) -> float:
-        """
-        The fitness of a chromosome is the cost of the decoded solution.
-        """
-        return self._decode(chromosome).cost
-
-    def _mutate_gene(self, chromosome: Chromosome[int], locus: int) -> None:
-        """
-        Mutates a gene by flipping its bit (0 becomes 1, and 1 becomes 0).
-        """
-        chromosome[locus] = 1 - chromosome[locus]
         

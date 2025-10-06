@@ -1,36 +1,24 @@
 from problems.SCQBF.SCQBF import SCQBF
-from problems.QBF.solver.GA_QBF import GA_QBF
+from problems.SCQBF.solver.GA_SCQBF import GA_SCQBF
 import time
 import os
 
-instances_path = os.path.join(os.getcwd(), "problems/QBF/instances")
-filepath = os.path.join(instances_path, "qbf020")
-
-
+instances_path = os.path.join(os.getcwd(), "problems/SCQBF/instances")
+filepath = os.path.join(instances_path, "scqbf025")
 
 start_time = time.time()
 
-# 1. Initialize the Genetic Algorithm solver for QBF
-ga = GA_QBF(
+ga = GA_SCQBF(
     generations=1000,
     pop_size=100,
     mutation_rate=1.0 / 100.0,
     filename=filepath
 )
 
-
-
-# # 2. Run the solver to find the best solution
 best_sol = ga.solve()
 print(f"{best_sol}")
 
-# except FileNotFoundError:
-#     print("Error: Instance file 'instances/qbf/qbf100' could not be found.")
-# except Exception as e:
-#     print(f"An error occurred: {e}")
-
-# # Record the ending time and calculate the duration
 end_time = time.time()
 total_time = end_time - start_time
 
-# print(f"Time = {total_time:.3f} seconds")
+print(f"Time = {total_time:.3f} seconds")

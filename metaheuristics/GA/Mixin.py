@@ -49,3 +49,11 @@ class StochasticUniversalSelectionMixin(Generic[G, F]):
         print("Using Stochastic Universal Selection.")
         # TODO: implement this method
         return
+
+
+class UniformCrossoverMixin(Generic[G, F]):
+    """
+    Overrides the default crossover with Stochastic Uniform Crossover.
+    """
+    def _crossover(self):
+        return

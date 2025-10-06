@@ -30,11 +30,17 @@ class GA_SCQBF(
 
     def _decode(self, chromosome: Chromosome[int]) -> Solution[int]:
         """
-        Decodes a binary chromosome into a QBF solution.
+        Decodes a binary chromosome into a SCQBF solution.
 
         The solution is represented by the list of indices where the
         chromosome has a value of 1.
         """
-        # TODO: Implement this method
+        solution = Solution[int]()
+        for locus, gene in enumerate(chromosome):
+            if gene == 1:
+                solution.append(locus)
+        
+        self.obj_function.evaluate(solution)
+        return solution
 
         

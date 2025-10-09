@@ -17,6 +17,7 @@ class SCQBF(Evaluator[int]):
         self.subsets: List[Set[int]]
         self.size = self._read_instance(filename)
         self.variables = np.zeros(self.size)
+
     
     def _read_instance(self, filename: str) -> int:
         """
@@ -59,6 +60,83 @@ class SCQBF(Evaluator[int]):
     
     def get_domain_size(self):
         return self.size
+
+
+    @staticmethod
+    def _tri(A: List[List[float]], i: int, j: int) -> float:
+        return A[i][j] if i <= j else A[j][i]
+
+    def _genes_of(self, sol: Solution[int]) -> List[int]:
+        g = [0] * self.size
+        for i in sol:
+            g[i] = 1
+        return g
+
+    # ----- função objetivo (maximização) -----
+    def value_of(self, genes: List[int]) -> float:
+        A, n = self.A, self.size
+        val = 0.0
+        for i in range(n):
+            if genes[i]:
+                val += A[i][i]
+                for j in range(i + 1, n):
+                    if genes[j]:
+                        val += self._tri(A, i, j)
+        return val
+
+    def delta_insert(self, i: int, genes: List[int]) -> float:
+        if genes[i]:
+            return 0.0
+        A, n = self.A, self.size
+        s = A[i][i]
+        for j in range(n):
+            if j != i and genes[j]:
+                s += self._tri(A, i, j)
+        return s
+
+    def delta_remove(self, i: int, genes: List[int]) -> float:
+        if not genes[i]:
+            return 0.0
+        A, n = self.A, self.size
+        s = -A[i][i]
+        for j in range(n):
+            if j != i and genes[j]:
+                s -= self._tri(A, i, j)
+        return s
+
+    # ----- cobertura (set-cover) -----
+    def build_cover_count(self, sol: Solution[int]) -> List[int]:
+        cover = [0] * self.size
+        for i in sol:
+            for k in self.subsets[i]:
+                cover[k] += 1
+        return cover
+
+    @staticmethod
+    def is_feasible_cover(cover: List[int]) -> bool:
+        return all(c > 0 for c in cover)
+
+    @staticmethod
+    def first_uncovered(cover: List[int]) -> int:
+        for k, c in enumerate(cover):
+            if c == 0:
+                return k
+        return -1
+
+    def removal_breaks(self, i: int, cover: List[int]) -> bool:
+        return any(cover[k] == 1 for k in self.subsets[i])
+
+    def evaluate(self, sol: Solution[int]) -> float:
+        genes = self._genes_of(sol)
+        sol.cost = self.value_of(genes)
+        return sol.cost
+
+    def evaluate_insertion_cost(self, elem: int, sol: Solution[int]) -> float:
+        genes = self._genes_of(sol)
+        if genes[elem] == 1:
+            return 0.0
+        delta_val = self.delta_insert(elem, genes)
+        return -delta_val
     
     def set_variables(self, sol: Solution[int]) -> None:
         """
@@ -186,4 +264,3 @@ class SCQBF(Evaluator[int]):
         sum_delta -= self._evaluate_contribution_scqbf(elem_out)
         sum_delta -= (self.A[elem_in, elem_out] + self.A[elem_out, elem_in])
         return sum_delta
-

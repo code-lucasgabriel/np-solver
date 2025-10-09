@@ -2,67 +2,23 @@ from problems.SCQBF.SCQBF import SCQBF
 from problems.SCQBF.solver.GA_SCQBF import GA_SCQBF
 import time
 import os
-from utils.Report import Report
-from utils.mixin import create_solver
-from metaheuristics.GA.Mixin import LatinHypercubeInitializerMixin, StochasticUniversalSelectionMixin
 
-def main():
-    """
-    Main function to run the genetic algorithm on all instances and generate a report.
-    """
-    base_path = os.getcwd()
-    instances_path = os.path.join(base_path, "problems/SCQBF/instances")
-    report_path = os.path.join(instances_path, "report")
-    mixin_configs = [[], [LatinHypercubeInitializerMixin, StochasticUniversalSelectionMixin], [LatinHypercubeInitializerMixin], [StochasticUniversalSelectionMixin]]
-    
-    for mixins in mixin_configs:
-        with Report(report_path, "SCQBF") as report_manager:
-            print(f"Report will be saved to: {report_manager.filepath}")
-            
-            try:
-                instance_files = [f for f in os.listdir(instances_path) if os.path.isfile(os.path.join(instances_path, f))]
-            except FileNotFoundError:
-                print(f"Error: The directory '{instances_path}' was not found.")
-                return
+instances_path = os.path.join(os.getcwd(), "problems/SCQBF/instances")
+filepath = os.path.join(instances_path, "scqbf025")
 
-            if not instance_files:
-                print("No instance files found in the directory.")
-                return
-                
-            for filename in instance_files:
-                filepath = os.path.join(instances_path, filename)
-                print(f"\nProcessing instance: {filename}...")
+start_time = time.time()
 
-                start_time = time.time()
+ga = GA_SCQBF(
+    generations=1000,
+    pop_size=100,
+    mutation_rate=1.0 / 100.0,
+    filename=filepath
+)
 
-                try:
-                    ga = create_solver(
-                        GA_SCQBF,
-                        mixins,
-                        generations=10000,
-                        pop_size=100,
-                        mutation_rate=1.0 / 100.0,
-                        filename=filepath
-                    )
+best_sol = ga.solve()
+print(f"{best_sol}")
 
-                    best_sol = ga.solve()
-                    
-                    end_time = time.time()
-                    total_time = end_time - start_time
-                    
-                    print(f"  -> Best Solution: {best_sol}")
-                    print(f"  -> Time = {total_time:.3f} seconds")
+end_time = time.time()
+total_time = end_time - start_time
 
-                    report_manager.write_result(filename, best_sol, total_time)
-
-                except Exception as e:
-                    error_message = f"Failed to process {filename}: {e}"
-                    print(f"  -> {error_message}")
-                    report_manager.write_result(filename, f"ERROR: {e}", 0)
-
-
-    print(f"\nAll instances processed. Report saved successfully!")
-
-
-if __name__ == "__main__":
-    main()
+print(f"Time = {total_time:.3f} seconds")

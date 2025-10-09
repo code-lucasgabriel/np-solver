@@ -16,18 +16,6 @@ class Evaluator(Generic[E], ABC):
     """
 
     @abstractmethod
-    def get_name(self) -> str:
-        """
-        Returns the name of the problem.
-
-        This can be used for logging or display purposes.
-
-        Returns:
-            str: The name of the problem.
-        """
-        pass
-
-    @abstractmethod
     def get_domain_size(self) -> int:
         """
         Returns the size of the problem domain.

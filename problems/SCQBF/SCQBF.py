@@ -157,6 +157,10 @@ class SCQBF(Evaluator[int]):
     
         return -self._evaluate_contribution_when_present(i)
 
+    def get_name(self) -> str:
+        """Returns the name of the problem."""
+        return "Set-Cover Quadratic Binary Function (SCQBF)"
+
     def _evaluate_contribution_when_present(self, i: int) -> float:
         """
         Calculates the total contribution of variable `i` to the objective function,

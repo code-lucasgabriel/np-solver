@@ -104,7 +104,13 @@ class GA(Generic[G, F], ABC):
     """
 
     def _start(self) -> None:
+        print("\n========================================")
+        print("Starting optimization...")
+        print("Problem:", self.obj_function.get_name())
+        print("Methaheuristic: Genetic Algorithm")
         self._mixin_ctrl()
+        print("========================================\n")
+        
 
     def solve(self) -> Optional[Solution[F]]:
         """

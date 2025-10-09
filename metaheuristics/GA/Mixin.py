@@ -18,9 +18,11 @@ class LatinHypercubeInitializerMixin(Generic[G, F]):
     """
     Overrides the default _initialize_population with LHS.
     """
+
+    def _status_lhs(self):
+        return True
+
     def _initialize_population(self) -> Population[G]:
-        print("Using Latin Hypercube initialization.")
-        
         if self.pop_size % 2 != 0:
             print(f"Warning: Pop size {self.pop_size} is odd. Adjusting to {self.pop_size+1} for balance.")
             self.pop_size += 1
@@ -42,13 +44,38 @@ class StochasticUniversalSelectionMixin(Generic[G, F]):
     """
     Overrides the default Tournament Selection with Stochastic Universal Selection (SUS).
     """
+    def _status_sus(self):
+        return True
+
     def _select_parents(self, population: Population[G]) -> Population[G]:
         """
-        Implementation of SUS selection.
+        Implementation of an efficient SUS selection.
         """
-        print("Using Stochastic Universal Selection.")
-        # TODO: implement this method
-        return
+        
+        parents = []
+        
+        fitness_scores = [self._fitness(individual) for individual in population]
+        total_fitness = sum(fitness_scores)
+        
+        num_to_select = self.pop_size
+        
+        pointer_distance = total_fitness / num_to_select
+        start_point = random.uniform(0, pointer_distance)
+        
+        current_pointer = start_point
+        cumulative_fitness = 0
+        population_index = 0
+        
+        for _ in range(num_to_select):
+            while cumulative_fitness < current_pointer:
+                cumulative_fitness += fitness_scores[population_index]
+                population_index += 1
+            
+            parents.append(population[population_index - 1])
+            current_pointer += pointer_distance
+            
+        return parents
+        
 
 
 class UniformCrossoverMixin(Generic[G, F]):

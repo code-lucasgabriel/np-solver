@@ -20,6 +20,7 @@ class SCQBF(Evaluator[int]):
         self.subsets: List[Set[int]]
         self.size = self._read_instance(filename)
         self.variables = np.zeros(self.size)
+        self.universe = set(range(self.size))
 
     def _read_instance(self, filename: str) -> int:
         """
@@ -76,6 +77,7 @@ class SCQBF(Evaluator[int]):
         for i in np.where(self.variables == 1)[0]:
             unionSet.update(self.subsets[i])
         
+    
         return len(unionSet) == self.size
 
     def _isFeasibleRemoval(self, idx: int):
@@ -113,7 +115,7 @@ class SCQBF(Evaluator[int]):
         """
         self.set_variables(sol)
         if not self._isFeasible():
-            cost = float('inf')
+            cost = -float('inf')
         else:
             cost = self.evaluate_scqbf()
         
@@ -136,7 +138,8 @@ class SCQBF(Evaluator[int]):
         if self.variables[i] == 1:
             return 0.0
         
-        return self._evaluate_contribution_scqbf(i)
+    
+        return self._evaluate_insertion_delta(i)
 
     def evaluate_removal_cost(self, elem: int, sol: Solution[int]) -> float:
         """Calculates the change in cost if `elem` is removed from the solution."""
@@ -149,18 +152,29 @@ class SCQBF(Evaluator[int]):
             return 0.0
         
         if not self._isFeasibleRemoval(i):
-            return float('inf')
+            return -float('inf')
         
-        return -self._evaluate_contribution_scqbf(i)
+    
+        return -self._evaluate_contribution_when_present(i)
 
-    def _evaluate_contribution_scqbf(self, i: int) -> float:
+    def _evaluate_contribution_when_present(self, i: int) -> float:
         """
-        Calculates the total contribution of variable `i` to the objective function.
+        Calculates the total contribution of variable `i` to the objective function,
+        ASSUMING self.variables[i] is 1. This formula is only correct under that assumption.
         Contribution = A_ii + sum_{j!=i} (A_ij + A_ji) * x_j
-        Since A is now symmetric, A_ij + A_ji = 2 * A_ij.
         """
         contribution = 2 * np.dot(self.A[i, :], self.variables) - self.A[i, i]
         return contribution
+    
+
+    def _evaluate_insertion_delta(self, i: int) -> float:
+        """
+        Correctly calculates the marginal cost of adding variable `i`.
+        ASSUMING self.variables[i] is 0.
+        Delta = A_ii + sum_{j!=i} (A_ij + A_ji) * x_j
+        """
+        
+        return self.A[i, i] + 2 * np.dot(self.A[i, :], self.variables)
 
     def evaluate_exchange_cost(self, elem_in: int, elem_out: int, sol: Solution[int]) -> float:
         """Calculates the change in cost for swapping two elements."""
@@ -168,16 +182,20 @@ class SCQBF(Evaluator[int]):
         
         if elem_in == elem_out:
             return 0.0
-        if self.variables[elem_in] == 1.0: # elem_in is already in solution
+        
+        if self.variables[elem_in] == 1.0: 
             return self._evaluate_removal_scqbf(elem_out)
-        if self.variables[elem_out] == 0.0: # elem_out is not in solution
+        
+        if self.variables[elem_out] == 0.0:
             return self._evaluate_insertion_scqbf(elem_in)
         
         if not self._isFeasibleExchange(elem_out, elem_in):
-            return float('inf')
+            return -float('inf')
+        
+        delta_add = self._evaluate_insertion_delta(elem_in)
+        delta_rem = self._evaluate_contribution_when_present(elem_out)
+        
 
-        sum_delta = 0.0
-        sum_delta += self._evaluate_contribution_scqbf(elem_in)
-        sum_delta -= self._evaluate_contribution_scqbf(elem_out)
-        sum_delta -= 2 * self.A[elem_in, elem_out]
-        return sum_delta
+        interaction_term = 2 * self.A[elem_in, elem_out]
+
+        return delta_add - delta_rem - interaction_term

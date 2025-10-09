@@ -59,7 +59,6 @@ class GA(Generic[G, F], ABC):
         self.best_sol: Optional[Solution[F]] = None
         self.best_chromosome: Optional[Chromosome[G]] = None
 
-
     """
     <- ABSTRACT METHODS (Problem-Specific - MUST be implemented in subclass) ->
     """
@@ -88,9 +87,24 @@ class GA(Generic[G, F], ABC):
             parents.append(p1 if self._fitness(p1) > self._fitness(p2) else p2)
         return parents
 
+    def _status_lhs(self):
+        return False
+
+    def _status_sus(self):
+        return False
+        
+    def _mixin_ctrl(self):
+        if self._status_lhs():
+            print("Info: Latin Hypercube Sampling initialization activated.")
+        if self._status_sus():
+            print("Info: Stochastic Universal Selection activated.")
+
     """
     <- Optional methods with default implementation ->
     """
+
+    def _start(self) -> None:
+        self._mixin_ctrl()
 
     def solve(self) -> Optional[Solution[F]]:
         """
@@ -101,6 +115,8 @@ class GA(Generic[G, F], ABC):
         Returns:
             The best solution found after all generations are complete.
         """
+        self._start()
+
         population = self._initialize_population()
 
         self.best_chromosome = self._get_best_chromosome(population)

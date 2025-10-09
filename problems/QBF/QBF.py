@@ -47,6 +47,10 @@ class QBF(Evaluator[int]):
                     token_idx += 1
         return _size
 
+    def get_name(self) -> str:
+        """Returns the name of the problem."""
+        return "Quadratic Binary Function (QBF)"
+
     def get_domain_size(self) -> int:
         """Returns the number of variables in the problem."""
         return self.size

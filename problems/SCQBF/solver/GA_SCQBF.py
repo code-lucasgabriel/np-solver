@@ -1,13 +1,10 @@
 from metaheuristics.GA.GA import GA, Chromosome
-from metaheuristics.GA.Mixin import LatinHypercubeInitializerMixin, StochasticUniversalSelectionMixin
 from problems.SCQBF.SCQBF import SCQBF
 from problems.QBF.QBF import QBF
 from interface.Solution import Solution
 import time
 
 class GA_SCQBF(
-    LatinHypercubeInitializerMixin[int, int],
-    StochasticUniversalSelectionMixin[int, int],
     GA[int, int]
 ):
     """

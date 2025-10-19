@@ -2,9 +2,9 @@ from problems.SCQBF.SCQBF import SCQBF
 from problems.SCQBF.solver.GA_SCQBF import GA_SCQBF
 import time
 import os
-from utils.Report import Report
-from utils.mixin import create_solver
-from metaheuristics.GA.Mixin import LatinHypercubeInitializerMixin, StochasticUniversalSelectionMixin
+from reporting.logger import Report
+from metaheuristics import assemble
+from metaheuristics.ga.operators import LatinHypercubeInitializer, StochasticUniversalSelection
 
 def main():
     """
@@ -13,7 +13,7 @@ def main():
     base_path = os.getcwd()
     instances_path = os.path.join(base_path, "problems/SCQBF/instances")
     report_path = os.path.join(instances_path, "report")
-    mixin_configs = [[], [LatinHypercubeInitializerMixin, StochasticUniversalSelectionMixin], [LatinHypercubeInitializerMixin], [StochasticUniversalSelectionMixin]]
+    mixin_configs = [[LatinHypercubeInitializer, StochasticUniversalSelection], [LatinHypercubeInitializer], [StochasticUniversalSelection], []]
     
     for mixins in mixin_configs:
         with Report(report_path, "SCQBF") as report_manager:
@@ -36,7 +36,7 @@ def main():
                 start_time = time.time()
 
                 try:
-                    ga = create_solver(
+                    ga = assemble(
                         GA_SCQBF,
                         mixins,
                         generations=10000,

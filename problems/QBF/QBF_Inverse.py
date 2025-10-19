@@ -1,5 +1,5 @@
 from problems.QBF.QBF import QBF
-from interface.Solution import Solution
+from core.solution import BaseSolution
 
 
 class QBF_Inverse(QBF):
@@ -44,7 +44,7 @@ class QBF_Inverse(QBF):
         """
         return -super()._evaluate_removal_qbf(i)
     
-    def evaluate_exchange_cost(self, elem_in: int, elem_out: int, sol: Solution[int]) -> float:
+    def evaluate_exchange_cost(self, elem_in: int, elem_out: int, sol: BaseSolution[int]) -> float:
         """
         Returns the negated value of the exchange cost.
         """

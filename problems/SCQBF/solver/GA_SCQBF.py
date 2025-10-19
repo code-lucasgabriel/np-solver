@@ -1,11 +1,11 @@
-from metaheuristics.GA.GA import GA, Chromosome
+from metaheuristics.ga import BaseGA, Chromosome
 from problems.SCQBF.SCQBF import SCQBF
 from problems.QBF.QBF import QBF
-from interface.Solution import Solution
+from core.solution import BaseSolution
 import time
 
 class GA_SCQBF(
-    GA[int, int]
+    BaseGA[int, int]
 ):
     """
     A specific implementation of the Genetic Algorithm for solving the
@@ -26,14 +26,14 @@ class GA_SCQBF(
         scqbf_instance = SCQBF(filename)
         super().__init__(scqbf_instance, generations, pop_size, mutation_rate)
 
-    def _decode(self, chromosome: Chromosome[int]) -> Solution[int]:
+    def _decode(self, chromosome: Chromosome[int]) -> BaseSolution[int]:
         """
         Decodes a binary chromosome into a SCQBF solution.
 
         The solution is represented by the list of indices where the
         chromosome has a value of 1.
         """
-        solution = Solution[int]()
+        solution = BaseSolution[int]()
         for locus, gene in enumerate(chromosome):
             if gene == 1:
                 solution.append(locus)

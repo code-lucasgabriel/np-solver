@@ -1,6 +1,6 @@
-from metaheuristics.GRASP import GRASP
+from metaheuristics.grasp.GRASP import GRASP
 from problems.QBF.QBF_Inverse import QBF_Inverse
-from interface.Solution import Solution
+from core.solution import BaseSolution
 from typing import List
 
 
@@ -42,16 +42,16 @@ class GRASP_QBF(GRASP[int]):
         """
         pass
 
-    def create_empty_sol(self) -> Solution[int]:
+    def create_empty_sol(self) -> BaseSolution[int]:
         """
         Creates an empty solution with a cost of 0.0, which is the known
         cost for an all-zero QBF solution.
         """
-        sol = Solution[int]()
+        sol = BaseSolution[int]()
         sol.cost = 0.0
         return sol
 
-    def local_search(self) -> Solution[int]:
+    def local_search(self) -> BaseSolution[int]:
         """
         Performs a local search based on the "best improvement" strategy.
 

@@ -1,9 +1,9 @@
-from interface.Evaluator import Evaluator
-from interface.Solution import Solution
+from core.evaluator import BaseEvaluator
+from core.solution import BaseSolution
 from typing import List, Set
 import numpy as np
 
-class SCQBF(Evaluator[int]):
+class SCQBF(BaseEvaluator[int]):
     """
     A Set-Cover Quadratic Binary Function (SCQBF) problem evaluator.
 
@@ -61,7 +61,7 @@ class SCQBF(Evaluator[int]):
     def get_domain_size(self):
         return self.size
 
-    def set_variables(self, sol: Solution[int]) -> None:
+    def set_variables(self, sol: BaseSolution[int]) -> None:
         """
         Converts a Solution (list of indices) into a binary vector representation.
         """
@@ -108,7 +108,7 @@ class SCQBF(Evaluator[int]):
 
         return len(unionSet) == self.size
 
-    def evaluate(self, sol: Solution[int]) -> float:
+    def evaluate(self, sol: BaseSolution[int]) -> float:
         """
         Evaluates a solution by computing x' * A * x.
         This method updates the solution's cost.
@@ -128,7 +128,7 @@ class SCQBF(Evaluator[int]):
         """
         return self.variables @ self.A @ self.variables
 
-    def evaluate_insertion_cost(self, elem: int, sol: Solution[int]) -> float:
+    def evaluate_insertion_cost(self, elem: int, sol: BaseSolution[int]) -> float:
         """Calculates the change in cost if `elem` is added to the solution."""
         self.set_variables(sol)
         return self._evaluate_insertion_scqbf(elem)
@@ -141,7 +141,7 @@ class SCQBF(Evaluator[int]):
     
         return self._evaluate_insertion_delta(i)
 
-    def evaluate_removal_cost(self, elem: int, sol: Solution[int]) -> float:
+    def evaluate_removal_cost(self, elem: int, sol: BaseSolution[int]) -> float:
         """Calculates the change in cost if `elem` is removed from the solution."""
         self.set_variables(sol)
         return self._evaluate_removal_scqbf(elem)
@@ -180,7 +180,7 @@ class SCQBF(Evaluator[int]):
         
         return self.A[i, i] + 2 * np.dot(self.A[i, :], self.variables)
 
-    def evaluate_exchange_cost(self, elem_in: int, elem_out: int, sol: Solution[int]) -> float:
+    def evaluate_exchange_cost(self, elem_in: int, elem_out: int, sol: BaseSolution[int]) -> float:
         """Calculates the change in cost for swapping two elements."""
         self.set_variables(sol)
         

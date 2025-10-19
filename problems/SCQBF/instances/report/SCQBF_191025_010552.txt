@@ -1,0 +1,16 @@
+--- Instance: scqbf400 ---
+Best Solution: ERROR: metaclass conflict: the metaclass of a derived class must be a (non-strict) subclass of the metaclasses of all its bases
+Execution Time: 0.000 seconds
+
+--- Instance: scqbf200 ---
+Best Solution: ERROR: metaclass conflict: the metaclass of a derived class must be a (non-strict) subclass of the metaclasses of all its bases
+Execution Time: 0.000 seconds
+
+--- Instance: scqbf050 ---
+Best Solution: ERROR: metaclass conflict: the metaclass of a derived class must be a (non-strict) subclass of the metaclasses of all its bases
+Execution Time: 0.000 seconds
+
+--- Instance: scqbf025 ---
+Best Solution: ERROR: metaclass conflict: the metaclass of a derived class must be a (non-strict) subclass of the metaclasses of all its bases
+Execution Time: 0.000 seconds
+

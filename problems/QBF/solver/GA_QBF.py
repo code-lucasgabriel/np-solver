@@ -1,11 +1,11 @@
-from metaheuristics.GA.GA import GA, Chromosome
-from metaheuristics.GA.Mixin import LatinHypercubeInitializerMixin
+from metaheuristics.ga import BaseGA, Chromosome
+from metaheuristics.ga.operators import LatinHypercubeInitializer
 from problems.QBF.QBF import QBF
-from interface.Solution import Solution
+from core.solution import BaseSolution
 import time
 
 class GA_QBF(
-    GA[int, int]
+    BaseGA[int, int]
 ):
     """
     A specific implementation of the Genetic Algorithm for solving the
@@ -26,14 +26,14 @@ class GA_QBF(
         qbf_instance = QBF(filename)
         super().__init__(qbf_instance, generations, pop_size, mutation_rate)
 
-    def _decode(self, chromosome: Chromosome[int]) -> Solution[int]:
+    def _decode(self, chromosome: Chromosome[int]) -> BaseSolution[int]:
         """
         Decodes a binary chromosome into a QBF solution.
 
         The solution is represented by the list of indices where the
         chromosome has a value of 1.
         """
-        solution = Solution[int]()
+        solution = BaseSolution[int]()
         for locus, gene in enumerate(chromosome):
             if gene == 1:
                 solution.append(locus)

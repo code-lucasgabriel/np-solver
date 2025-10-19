@@ -1,6 +1,6 @@
-from metaheuristics.TS import TS
+from metaheuristics.ts.TS import TS
 from problems.QBF.QBF_Inverse import QBF_Inverse
-from interface.Solution import Solution
+from core.solution import BaseSolution
 import time
 from collections import deque
 from typing import Deque, List, Optional
@@ -78,7 +78,7 @@ class TS_QBF(TS[int]):
         """
         pass
 
-    def create_empty_sol(self) -> Solution[int]:
+    def create_empty_sol(self) -> BaseSolution[int]:
         """
         Creates an empty solution for the QBF problem.
 
@@ -86,13 +86,13 @@ class TS_QBF(TS[int]):
         which has a known cost of 0.0.
 
         Returns:
-            Solution[int]: An empty solution with its cost initialized to 0.0.
+            BaseSolution[int]: An empty solution with its cost initialized to 0.0.
         """
-        sol = Solution[int]()
+        sol = BaseSolution[int]()
         sol.cost = 0.0
         return sol
 
-    def neighborhood_move(self) -> Solution[int]:
+    def neighborhood_move(self) -> BaseSolution[int]:
         """
         Performs a neighborhood move by exploring insertions, removals, and exchanges.
 
@@ -101,7 +101,7 @@ class TS_QBF(TS[int]):
         a tabu move if it leads to a solution better than any found so far.
 
         Returns:
-            Solution[int]: The modified solution after the move.
+            BaseSolution[int]: The modified solution after the move.
         """
         min_delta_cost = float('inf')
         best_cand_in: Optional[int] = None

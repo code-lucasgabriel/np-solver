@@ -1,9 +1,7 @@
-from np_solver.core.evaluator import BaseEvaluator
-from np_solver.core.solution import BaseSolution
 import random
 import numbers
-from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, List, Optional, Set
+from abc import ABC
+from typing import TypeVar, Generic, List
 
 G = TypeVar('G', bound=numbers.Number)
 F = TypeVar('F')

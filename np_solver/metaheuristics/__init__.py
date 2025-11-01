@@ -1,1 +1,2 @@
-from .assembler import assemble
+from .metaheuristic import BaseMetaheuristic
+

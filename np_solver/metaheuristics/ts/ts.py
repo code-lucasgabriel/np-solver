@@ -1,5 +1,5 @@
-from np_solver.core.evaluator import BaseEvaluator
-from np_solver.core.solution import BaseSolution
+from np_solver.core import BaseEvaluator
+from np_solver.core import BaseSolution
 import abc
 import random
 from collections import deque
@@ -23,7 +23,7 @@ class TS(abc.ABC, Generic[E]):
     verbose: bool = True
     _rng: random.Random = random.Random(0)
 
-    def __init__(self, obj_function: BaseEvaluator[E], tenure: int, iterations: int):
+    def __init__(self, evaluator: BaseEvaluator[E], tenure: int, iterations: int):   
         """
         Initializes the AbstractTS solver.
 
@@ -33,11 +33,11 @@ class TS(abc.ABC, Generic[E]):
                           considered "tabu".
             iterations (int): The total number of iterations for the main search loop.
         """
-        self.obj_function: BaseEvaluator[E] = obj_function
+        self.evaluator: BaseEvaluator[E] = evaluator
         self.tenure: int = tenure
         self.iterations: int = iterations
-        self.best_sol: BaseSolution[E]
-        self.sol: BaseSolution[E]
+        self.best_sol: BaseSolution
+        self.sol: BaseSolution
         self.cl: List[E]
         self.rcl: List[E]
         self.tl: Deque[E]
@@ -141,7 +141,7 @@ class TS(abc.ABC, Generic[E]):
         """
         self.cl = self.make_cl()
         self.rcl = self.make_rcl()
-        self.sol = self.create_empty_sol()
+        self.sol = self.BaseSolutiuon()
         cost = float('inf')
 
         # Main loop, continues as long as the solution cost is improving
@@ -193,7 +193,7 @@ class TS(abc.ABC, Generic[E]):
         for i in range(self.iterations):
             self.neighborhood_move()
             if self.sol.cost < self.best_sol.cost:
-                self.best_sol = Solution(self.sol)
+                self.best_sol = self.sol
                 if self.verbose:
                     print(f"(Iter. {i}) BestSol = {self.best_sol}")
 

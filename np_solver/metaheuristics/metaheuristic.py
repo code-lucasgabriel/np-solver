@@ -141,6 +141,6 @@ class BaseMetaheuristic(ABC):
                 continue
             self.current_iteration+=1
         
-        self.problem.report_experiments(self.best_solution)
+        self.problem.report_experiment(self.problem.get_instance_name(), self.best_solution)
 
         return self.best_solution

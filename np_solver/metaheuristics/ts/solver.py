@@ -65,7 +65,6 @@ class TabuSearch(BaseMetaheuristic):
         best_allowed_cost = self._infeasible_cost
         
         # 1. Generate all moves
-        print(f"Sover current solution: {self.current_solution}")
         all_moves = self.neighborhood.generate_moves(self.current_solution, self.problem)
 
         if not all_moves:
